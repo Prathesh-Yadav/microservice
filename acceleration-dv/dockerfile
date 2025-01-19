@@ -1,0 +1,20 @@
+FROM node:10.14.2
+
+# Create app directory
+RUN mkdir -p /app
+WORKDIR /app
+
+# Copy the application code to the container
+COPY . /app/
+
+# Install dependencies and build the application
+RUN yarn install && yarn build
+
+# Set environment variable for port
+ENV WEB_PORT=3001
+
+# Expose the port used by the service
+EXPOSE 3001
+
+# Start the application
+CMD ["yarn", "start"]
