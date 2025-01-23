@@ -2,6 +2,10 @@ pipeline {
     agent {
         label "java"
     }
+    environment {
+        SONAR_URL = 'http:3.110.142.127:9000'
+        SONAR_TOKEN = credentials('sonarqube-secretkey') // Use Jenkins credentials for secure storage
+    }
     stages {
         stage("Build the app") {
             steps {
@@ -16,6 +20,31 @@ pipeline {
                             sh "yarn install"
                             sh "yarn build"
                             echo "Build completed for ${project}"
+                            // Run JaCoCo analysis (Assumes JaCoCo setup in project)
+                            echo "Running JaCoCo for ${project}"
+                            sh "./gradlew jacocoTestReport" // Adjust if using a different build tool
+                            // Run SonarQube analysis
+                            echo "Running SonarQube analysis for ${project}"
+                            def scannerHome = tool 'scanner_sonar'
+                                      withSonarQubeEnv('jenkins-sonar') { 
+                                sh """
+                                    ${scannerHome}/bin/sonar-scanner \
+                                    -Dsonar.projectKey=${project} \
+                                    -Dsonar.projectName=${project} \
+                                    -Dsonar.sources=. \
+                                    -Dsonar.language=ts \
+                                    -Dsonar.host.url=${SONAR_HOST_URL} \
+                                    -Dsonar.login=${SONAR_TOKEN} \
+                                    -Dsonar.exclusions=**/node_modules/**,**/dist/**
+                                """
+                            }
+                            /*
+                            // Wait for the quality gate to complete
+                            timeout(time: 1, unit: 'HOURS') {
+                            def qualityGate = waitForQualityGate()
+                            if (qualityGate.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qualityGate.status}"
+                            */
                         }
                     }
                 }
