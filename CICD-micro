@@ -56,9 +56,7 @@ pipeline {
                             
                             // Define Nexus registry URLs
                             def nexusRegistries = [
-                                "${Image_url}:4000",
-                                "${Image_url}:4001",
-                                "${Image_url}:4002"
+                                "${Image_url}:4000"
                             ]
                             
                             // Use withCredentials to securely handle Nexus credentials
