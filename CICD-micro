@@ -6,7 +6,8 @@ pipeline {
         SONAR_URL = 'http://3.110.142.127:9000'
         SONAR_TOKEN = credentials('sonarqube-secretkey')
         NEXUS_URL = 'http://13.233.165.126:8081'
-        NEXUS_CREDENTIALS = credentials('nexus')
+        NEXUS_CREDENTIALS = credentials('nexus'),
+        Image_url = '13.233.165.126'
     }
     stages {
         stage("Build the app") {
@@ -55,9 +56,9 @@ pipeline {
                             
                             // Define Nexus registry URLs
                             def nexusRegistries = [
-                                "13.233.165.126:4000",
-                                "13.233.165.126:4001",
-                                "13.233.165.126:4002"
+                                "${Image_url}:4000",
+                                "${Image_url}:4001",
+                                "${Image_url}:4002"
                             ]
                             
                             // Use withCredentials to securely handle Nexus credentials
