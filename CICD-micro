@@ -60,24 +60,25 @@ pipeline {
                                 "13.233.165.126:4002"
                             ]
                             
-                            // Loop through each Nexus registry
-                            for (registry in nexusRegistries) {
-                                def imageTag = "${registry}/${project}:1.0"
-                                
-                                sh """
-                                    // Build Docker image
-                                    docker build -t ${imageTag} .
+                            // Use withCredentials to securely handle Nexus credentials
+                            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                                for (registry in nexusRegistries) {
+                                    def imageTag = "${registry}/${project}:1.0"
                                     
-                                    // Login to Nexus registry
-                                    echo "${NEXUS_CREDENTIALS_PSW}" | docker login -u "${NEXUS_CREDENTIALS_USR}" --password-stdin ${registry}
+                                    sh """
+                                        # Build Docker image
+                                        docker build -t ${imageTag} .
+                                        
+                                        # Login to Nexus registry
+                                        echo "${NEXUS_PASSWORD}" | docker login -u "${NEXUS_USERNAME}" --password-stdin ${registry}
+                                        
+                                        # Push Docker image
+                                        docker push ${imageTag}
+                                    """
                                     
-                                    // Push Docker image
-                                    docker push ${imageTag}
-                                """
-                                
-                                echo "Docker image pushed to Nexus repository: ${imageTag}"
+                                    echo "Docker image pushed to Nexus repository: ${imageTag}"
+                                }
                             }
-                    }
                 }
             }
         }
