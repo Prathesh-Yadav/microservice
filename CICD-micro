@@ -6,8 +6,8 @@ pipeline {
         SONAR_URL = 'http://3.110.142.127:9000'
         SONAR_TOKEN = credentials('sonarqube-secretkey')
         NEXUS_URL = 'http://13.233.165.126:8081'
-        NEXUS_CREDENTIALS = credentials('nexus'),
         Image_url = '13.233.165.126'
+        NEXUS_CREDENTIALS = credentials('nexus')
     }
     stages {
         stage("Build the app") {
