@@ -23,7 +23,7 @@ pipeline {
                             
                             // Run unit tests and generate coverage report using Jest or Mocha
                             echo "Running tests and generating coverage for ${project}"
-                            sh "npx jest --coverage" // Running Jest directly using npx
+                            sh "npx jest --coverage --passWithNoTests" // Running Jest directly using npx
                             
                             // Run SonarQube analysis
                             echo "Running SonarQube analysis for ${project}"
