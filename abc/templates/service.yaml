@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.services.accA.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: {{ .Values.services.accA.type }}
+  selector:
+    app: acc-a
+  ports:
+  - protocol: TCP
+    port: {{ .Values.services.accA.port }}
+    targetPort: {{ .Values.accA.containerPort }}
+---
+# acc-calc-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.services.accCalc.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: {{ .Values.services.accCalc.type }}
+  selector:
+    app: acc-calc
+  ports:
+  - protocol: TCP
+    port: {{ .Values.services.accCalc.port }}
+    targetPort: {{ .Values.accCalc.containerPort }}
+---
+# acc-dv-service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.services.accDv.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: {{ .Values.services.accDv.type }}
+  selector:
+    app: acc-dv
+  ports:
+  - protocol: TCP
+    port: {{ .Values.services.accDv.port }}
+    targetPort: {{ .Values.accDv.containerPort }}
+

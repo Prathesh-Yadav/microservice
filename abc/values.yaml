@@ -1,0 +1,63 @@
+namespace: micro
+
+serviceAccount:
+  create: true
+  name: acc-service-account
+
+ingress:
+  enabled: false   # Set to true if you want to enable ingress
+  # Optional settings if enabled is true
+  # host: example.com
+  # paths:
+  #   - /
+  #   - /api
+  # annotations:
+  #   nginx.ingress.kubernetes.io/rewrite-target: /
+  #   nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+autoscaling:
+  enabled: false   # Set to true if you want to enable HorizontalPodAutoscaler (HPA)
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+accA:
+  name: acc-a-deployment
+  image: prathesh67/aa:1.0
+  port: 3002
+  replicas: 2
+  livenessProbePath: /health
+  readinessProbePath: /health
+  containerPort: 3002
+
+accCalc:
+  name: acc-calc-deployment
+  image: prathesh67/acl:1.0
+  port: 3000
+  replicas: 2
+  livenessProbePath: /health
+  readinessProbePath: /health
+  containerPort: 3000
+
+accDv:
+  name: acc-dv-deployment
+  image: prathesh67/acc_dv:1.0
+  port: 3001
+  replicas: 2
+  livenessProbePath: /health
+  readinessProbePath: /health
+  containerPort: 3001
+
+services:
+  accA:
+    name: acc-a-service   # Ensure this is defined
+    type: ClusterIP
+    port: 3002
+  accCalc:
+    name: acc-calc-service   # Ensure this is defined
+    type: LoadBalancer
+    port: 3000
+  accDv:
+    name: acc-dv-service   # Ensure this is defined
+    type: ClusterIP
+    port: 3001

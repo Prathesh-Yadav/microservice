@@ -1,0 +1,43 @@
+{{- if .Values.serviceAccount.create }}
+Service Account created: {{ .Release.Name }}-service-account
+{{- else }}
+Service Account will not be created.
+{{- end }}
+
+{{- if .Values.ingress.enabled }}
+Ingress enabled:
+  - Host: {{ .Values.ingress.host }}
+  - Paths:
+      {{- range .Values.ingress.paths }}
+      - {{ . }}
+      {{- end }}
+{{- else }}
+Ingress is not enabled.
+{{- end }}
+
+{{- if .Values.autoscaling.enabled }}
+Horizontal Pod Autoscaler enabled:
+  - Min Replicas: {{ .Values.autoscaling.minReplicas }}
+  - Max Replicas: {{ .Values.autoscaling.maxReplicas }}
+  - Target CPU Utilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}%
+{{- else }}
+Horizontal Pod Autoscaler is not enabled.
+{{- end }}
+
+{{- with .Values.services.accA }}
+Service accA:
+  - Type: {{ .type }}
+  - Port: {{ .port }}
+{{- end }}
+
+{{- with .Values.services.accCalc }}
+Service accCalc:
+  - Type: {{ .type }}
+  - Port: {{ .port }}
+{{- end }}
+
+{{- with .Values.services.accDv }}
+Service accDv:
+  - Type: {{ .type }}
+  - Port: {{ .port }}
+{{- end }}

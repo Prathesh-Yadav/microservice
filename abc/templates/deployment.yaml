@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.accA.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.accA.replicas }}
+  selector:
+    matchLabels:
+      app: acc-a
+  template:
+    metadata:
+      labels:
+        app: acc-a
+    spec:
+      containers:
+      - name: acc-a
+        image: {{ .Values.accA.image }}
+        ports:
+        - containerPort: {{ .Values.accA.containerPort }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.accA.livenessProbePath }}
+            port: {{ .Values.accA.containerPort }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.accA.readinessProbePath }}
+            port: {{ .Values.accA.containerPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# acc-calc-deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.accCalc.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.accCalc.replicas }}
+  selector:
+    matchLabels:
+      app: acc-calc
+  template:
+    metadata:
+      labels:
+        app: acc-calc
+    spec:
+      containers:
+      - name: acc-calc
+        image: {{ .Values.accCalc.image }}
+        ports:
+        - containerPort: {{ .Values.accCalc.containerPort }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.accCalc.livenessProbePath }}
+            port: {{ .Values.accCalc.containerPort }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.accCalc.readinessProbePath }}
+            port: {{ .Values.accCalc.containerPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# acc-dv-deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.accDv.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.accDv.replicas }}
+  selector:
+    matchLabels:
+      app: acc-dv
+  template:
+    metadata:
+      labels:
+        app: acc-dv
+    spec:
+      containers:
+      - name: acc-dv
+        image: {{ .Values.accDv.image }}
+        ports:
+        - containerPort: {{ .Values.accDv.containerPort }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.accDv.livenessProbePath }}
+            port: {{ .Values.accDv.containerPort }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.accDv.readinessProbePath }}
+            port: {{ .Values.accDv.containerPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
