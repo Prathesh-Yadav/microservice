@@ -56,7 +56,6 @@ pipeline {
 
                             // Use withCredentials to securely handle Nexus credentials
                             withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                                for (registry in nexusRegistries) {
                                     def imageTag = "${Image_url}/${project}:1.0"
                                     
                                     sh """
@@ -71,7 +70,7 @@ pipeline {
                                     """
                                     
                                     echo "Docker image pushed to Nexus repository: ${imageTag}"
-                                }
+                                
                             }
                 }
             }
