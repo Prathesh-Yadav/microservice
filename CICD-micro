@@ -1,1 +1,34 @@
+pipeline{
+    agent{
+        label "java"
+    }
+    stages{
+        stage("Build the app"){
+            step{
+                // Install dependencies for each microservice
+                sh 'cd acceleration-a && yarn install'
+                sh 'cd acceleration-calc && yarn install'
+                sh 'cd acceleration-dv && yarn install'
 
+                // Run unit tests with JaCoCo for each microservice
+                sh 'cd acceleration-a && yarn test --coverage'
+                sh 'cd acceleration-calc && yarn test --coverage'
+                sh 'cd acceleration-dv && yarn test --coverage'
+
+                // Archive JaCoCo reports for each microservice
+                jacoco(
+                    execPattern: '**/acceleration-a/coverage/jacoco.exec',
+                    classPattern: '**/acceleration-a/build/classes'
+                )
+                jacoco(
+                    execPattern: '**/acceleration-calc/coverage/jacoco.exec',
+                    classPattern: '**/acceleration-calc/build/classes'
+                )
+                jacoco(
+                    execPattern: '**/acceleration-dv/coverage/jacoco.exec',
+                    classPattern: '**/acceleration-dv/build/classes'
+                )
+            }
+        }
+    }
+}
