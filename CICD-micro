@@ -1,33 +1,24 @@
-pipeline{
-    agent{
+pipeline {
+    agent {
         label "java"
     }
-    stages{
-        stage("Build the app"){
-            steps{
-                // Install dependencies for each microservice
-                sh 'cd acceleration-a && yarn install'
-                sh 'cd acceleration-calc && yarn install'
-                sh 'cd acceleration-dv && yarn install'
+    stages {
+        stage("Build the app") {
+            steps {
+                script {
+                    // Define the list of project directories
+                    def projects = ["acceleration-a", "acceleration-calc", "acceleration-dv"]
 
-                // Run unit tests with JaCoCo for each microservice
-                sh 'cd acceleration-a && yarn test --coverage'
-                sh 'cd acceleration-calc && yarn test --coverage'
-                sh 'cd acceleration-dv && yarn test --coverage'
-
-                // Archive JaCoCo reports for each microservice
-                jacoco(
-                    execPattern: '**/acceleration-a/coverage/jacoco.exec',
-                    classPattern: '**/acceleration-a/build/classes'
-                )
-                jacoco(
-                    execPattern: '**/acceleration-calc/coverage/jacoco.exec',
-                    classPattern: '**/acceleration-calc/build/classes'
-                )
-                jacoco(
-                    execPattern: '**/acceleration-dv/coverage/jacoco.exec',
-                    classPattern: '**/acceleration-dv/build/classes'
-                )
+                    // Loop through each project and run the required commands
+                    for (project in projects) {
+                        dir("microservice/${project}") {
+                            echo "Building project: ${project}"
+                            sh "yarn install"
+                            sh "yarn build"
+                            echo "Build completed for ${project}"
+                        }
+                    }
+                }
             }
         }
     }
