@@ -21,9 +21,9 @@ pipeline {
                             sh "yarn build"
                             echo "Build completed for ${project}"
                             
-                            // Run unit tests and generate coverage report using Jest and NYC
+                            // Run unit tests and generate coverage report using Jest or Mocha
                             echo "Running tests and generating coverage for ${project}"
-                            sh "yarn test --coverage"
+                            sh "npx jest --coverage" // Running Jest directly using npx
                             
                             // Run SonarQube analysis
                             echo "Running SonarQube analysis for ${project}"
