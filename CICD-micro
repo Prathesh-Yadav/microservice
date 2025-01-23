@@ -11,7 +11,7 @@ pipeline {
 
                     // Loop through each project and run the required commands
                     for (project in projects) {
-                        dir("Micro/${project}") {
+                        dir("/home/jenkinss/workspace/Micro/${project}") {
                             echo "Building project: ${project}"
                             sh "yarn install"
                             sh "yarn build"
