@@ -6,7 +6,7 @@ pipeline {
         SONAR_URL = 'http://3.110.142.127:9000'
         SONAR_TOKEN = credentials('sonarqube-secretkey')
         NEXUS_URL = 'http://13.233.165.126:8081'
-        NEXUS_CREDENTIALS = credentials('nexus') 
+        NEXUS_CREDENTIALS = credentials('nexus')
     }
     stages {
         stage("Build the app") {
@@ -50,16 +50,33 @@ pipeline {
                                     error "Pipeline aborted due to quality gate failure: ${qualityGate.status}"
                                 }
                             }
-                            // Build Docker image
+                            // Build and push Docker image to multiple Nexus repositories
                             echo "Building Docker image for ${project}"
-                            def imageTag = "nexus.example.com/${project}:latest"
-                            sh """
-                                docker build -t ${imageTag} .
-                                echo "${NEXUS_CREDENTIALS_PSW}" | docker login -u "${NEXUS_CREDENTIALS_USR}" --password-stdin ${NEXUS_URL}
-                                docker push ${imageTag}
-                            """
-                            echo "Docker image pushed: ${imageTag}"
-                        }
+                            
+                            // Define Nexus registry URLs
+                            def nexusRegistries = [
+                                "13.233.165.126:4000",
+                                "13.233.165.126:4001",
+                                "13.233.165.126:4002"
+                            ]
+                            
+                            // Loop through each Nexus registry
+                            for (registry in nexusRegistries) {
+                                def imageTag = "${registry}/${project}:1.0"
+                                
+                                sh """
+                                    // Build Docker image
+                                    docker build -t ${imageTag} .
+                                    
+                                    // Login to Nexus registry
+                                    echo "${NEXUS_CREDENTIALS_PSW}" | docker login -u "${NEXUS_CREDENTIALS_USR}" --password-stdin ${registry}
+                                    
+                                    // Push Docker image
+                                    docker push ${imageTag}
+                                """
+                                
+                                echo "Docker image pushed to Nexus repository: ${imageTag}"
+                            }
                     }
                 }
             }
