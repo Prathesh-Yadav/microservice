@@ -6,7 +6,7 @@ pipeline {
         SONAR_URL = 'http://3.110.142.127:9000'
         SONAR_TOKEN = credentials('sonarqube-secretkey')
         NEXUS_URL = 'http://13.233.165.126:8081'
-        Image_url = '13.233.165.126'
+        Image_url = '13.233.165.126:4000'
         NEXUS_CREDENTIALS = credentials('nexus')
     }
     stages {
@@ -53,23 +53,18 @@ pipeline {
                             }
                             // Build and push Docker image to multiple Nexus repositories
                             echo "Building Docker image for ${project}"
-                            
-                            // Define Nexus registry URLs
-                            def nexusRegistries = [
-                                "${Image_url}:4000"
-                            ]
-                            
+
                             // Use withCredentials to securely handle Nexus credentials
                             withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
                                 for (registry in nexusRegistries) {
-                                    def imageTag = "${registry}/${project}:1.0"
+                                    def imageTag = "${Image_url}/${project}:1.0"
                                     
                                     sh """
                                         # Build Docker image
                                         docker build -t ${imageTag} .
                                         
                                         # Login to Nexus registry
-                                        echo "${NEXUS_PASSWORD}" | docker login -u "${NEXUS_USERNAME}" --password-stdin ${registry}
+                                        echo "${NEXUS_PASSWORD}" | docker login -u "${NEXUS_USERNAME}" --password-stdin ${Image_url}
                                         
                                         # Push Docker image
                                         docker push ${imageTag}
