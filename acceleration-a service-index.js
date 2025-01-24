@@ -29,6 +29,16 @@ const server = http.createServer((req, res) => {
         }),
       );
       break;
+    case '/dv':
+      // Calculate 'dv' using the provided formula
+      const dv = Number(query.vf) - Number(query.vi);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(
+        JSON.stringify({
+          dv,
+        }),
+      );
+      break;
     default:
       res.writeHead(404, { 'Content-Type': 'text/html' });
       res.end('Not Found');
@@ -46,4 +56,4 @@ server.listen(port, (err: Error) => {
 
 setTimeout(() => {
   status.fail = true;
-}, Math.random() * 300
+}, Math.random() * 300000);
