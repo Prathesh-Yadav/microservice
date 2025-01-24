@@ -34,13 +34,7 @@ const server = http.createServer((req, res) => {
           res.writeHead(500, { 'Content-Type': 'text/html' });
           res.end('something wrong');
         });
-      break;
-    case '/dv':
-      const vf = Number(query.vf);
-      const vi = Number(query.vi);
-      const dv = vf - vi;
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ dv }));
+
       break;
     default:
       res.writeHead(404, { 'Content-Type': 'text/html' });
