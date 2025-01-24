@@ -1,0 +1,63 @@
+---
+- name: Create a namespace for ArgoCD Image Updater
+  kubernetes.core.k8s:
+    kubeconfig: /etc/kubernetes/admin.conf
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: argocd-image-updater
+  become: yes
+
+- name: Add the ArgoCD Image Updater Helm repository
+  command:
+    cmd: helm repo add argocd-image-updater https://argoproj.github.io/argo-helm
+    creates: /root/.cache/helm/repository/argocd-image-updater-index.yaml
+  become: yes
+
+- name: Update Helm repositories
+  command:
+    cmd: helm repo update
+  become: yes
+
+- name: Install ArgoCD Image Updater using Helm
+  command:
+    cmd: helm upgrade --install argocd-image-updater argocd-image-updater/argocd-image-updater \
+         --namespace argocd-image-updater \
+         --set config.argocd.server.address=http://argocd-server.argocd.svc.cluster.local:80 \
+         --set config.argocd.server.plaintext=true \
+         --set config.image.credentials[0].registry=${Image_url} \
+         --set config.image.credentials[0].username=${NEXUS_USERNAME} \
+         --set config.image.credentials[0].password=${NEXUS_PASSWORD}
+  become: yes
+
+- name: Verify ArgoCD Image Updater is deployed
+  kubernetes.core.k8s_info:
+    kubeconfig: /etc/kubernetes/admin.conf
+    kind: Pod
+    namespace: argocd-image-updater
+  register: updater_pods
+  until: "{{ updater_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | length == updater_pods.resources | length }}"
+  retries: 10
+  delay: 15
+  become: yes
+
+- name: Patch ArgoCD for automatic sync
+  kubernetes.core.k8s:
+    kubeconfig: /etc/kubernetes/admin.conf
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: argocd-cm
+        namespace: argocd
+      data:
+        application.instanceLabelKey: "argocd.argoproj.io/instance"
+        repositories: |
+          - url: ${NEXUS_URL}
+  become: yes
+
+- name: Restart ArgoCD server to apply changes
+  command:
+    cmd: kubectl rollout restart deployment argocd-server -n argocd
+  become: yes
